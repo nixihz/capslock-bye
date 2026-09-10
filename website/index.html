@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CapsLock Bye — Tap Esc · Hold Hyper</title>
+  <meta name="description" content="给 Mac 效率用户，让 Caps Lock 真正好用——轻点 Esc，按住变 Hyper。本地、无账号、公证直链、免费装。">
+  <style>
+    :root {
+      --bg: #0f1115;
+      --fg: #f2f3f5;
+      --muted: #9aa3b2;
+      --card: #1a1d24;
+      --line: #2a2f3a;
+      --accent: #6ea8fe;
+      --ok: #3dd68c;
+      --radius: 14px;
+      --max: 720px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(1200px 600px at 50% -10%, #1c2436 0%, var(--bg) 55%);
+      color: var(--fg);
+      line-height: 1.55;
+      min-height: 100vh;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .wrap { max-width: var(--max); margin: 0 auto; padding: 28px 20px 64px; }
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 48px;
+    }
+    .brand { font-weight: 650; letter-spacing: -0.02em; }
+    .lang {
+      display: inline-flex; gap: 4px; border: 1px solid var(--line);
+      border-radius: 999px; padding: 2px; background: var(--card);
+    }
+    .lang button {
+      border: 0; background: transparent; color: var(--muted);
+      padding: 6px 12px; border-radius: 999px; cursor: pointer; font: inherit;
+    }
+    .lang button[aria-pressed="true"] {
+      background: #2b3344; color: var(--fg);
+    }
+    h1 {
+      font-size: clamp(1.7rem, 4vw, 2.35rem);
+      line-height: 1.2; letter-spacing: -0.03em; margin: 0 0 14px;
+    }
+    .sub { color: var(--muted); margin: 0 0 28px; font-size: 1.05rem; }
+    .pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 28px; padding: 0; list-style: none; }
+    .pills li {
+      font-size: 0.85rem; color: var(--muted);
+      border: 1px solid var(--line); border-radius: 999px;
+      padding: 4px 10px; background: rgba(255,255,255,0.02);
+    }
+    .demo {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 28px;
+    }
+    @media (max-width: 560px) { .demo { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--card); border: 1px solid var(--line);
+      border-radius: var(--radius); padding: 18px 16px;
+    }
+    .card .kicker { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    .card .action { font-size: 1.25rem; font-weight: 650; margin-top: 6px; }
+    .card .detail { color: var(--muted); font-size: 0.92rem; margin-top: 6px; }
+    .cta-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 10px; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--fg); color: #111; font-weight: 650;
+      border-radius: 12px; padding: 12px 18px; border: 0;
+      text-decoration: none; font-size: 1rem;
+    }
+    .btn:hover { filter: brightness(0.95); text-decoration: none; }
+    .meta { color: var(--muted); font-size: 0.88rem; }
+    .meta code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.8rem; word-break: break-all;
+    }
+    section { margin-top: 48px; }
+    section h2 { font-size: 1.2rem; margin: 0 0 14px; letter-spacing: -0.02em; }
+    .steps { display: grid; gap: 12px; }
+    .step {
+      display: grid; grid-template-columns: 36px 1fr; gap: 12px;
+      background: var(--card); border: 1px solid var(--line);
+      border-radius: var(--radius); padding: 16px;
+    }
+    .num {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: grid; place-items: center; background: #243049;
+      color: var(--accent); font-weight: 700;
+    }
+    .step h3 { margin: 0 0 4px; font-size: 1rem; }
+    .step p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+    .fail {
+      margin-top: 14px; padding: 14px 16px; border-radius: var(--radius);
+      border: 1px dashed var(--line); color: var(--muted); font-size: 0.88rem;
+    }
+    .fail strong { color: var(--fg); }
+    .fail ul { margin: 8px 0 0; padding-left: 1.1em; }
+    footer {
+      margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--line);
+      color: var(--muted); font-size: 0.9rem;
+      display: flex; flex-wrap: wrap; gap: 12px 20px; justify-content: space-between;
+    }
+    footer .links { display: flex; flex-wrap: wrap; gap: 14px; }
+    #support {
+      margin-top: 36px; padding: 16px; border-radius: var(--radius);
+      border: 1px solid var(--line); background: rgba(255,255,255,0.02);
+    }
+    #support h2 { margin-bottom: 8px; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">CapsLock Bye</div>
+      <div class="lang" role="group" aria-label="Language">
+        <button type="button" id="btn-zh" aria-pressed="true">中</button>
+        <button type="button" id="btn-en" aria-pressed="false">EN</button>
+      </div>
+    </header>
+
+    <main>
+      <h1 data-i18n="hero_title">Caps Lock 终于有用了——轻点 Esc，按住变 Hyper</h1>
+      <p class="sub" data-i18n="hero_sub">给 Mac 上写代码、用 Vim / Alfred / 自定义热键的人。本地运行，无账号，菜单栏即装即用。</p>
+      <ul class="pills">
+        <li data-i18n="pill_local">本地 · 无账号</li>
+        <li data-i18n="pill_free">公证直链 · 免费装</li>
+        <li data-i18n="pill_os">macOS 14+</li>
+      </ul>
+
+      <div class="demo" aria-label="Demo">
+        <div class="card">
+          <div class="kicker" data-i18n="demo_tap_k">Tap</div>
+          <div class="action" data-i18n="demo_tap_a">轻点 → Esc</div>
+          <div class="detail" data-i18n="demo_tap_d">适合 Vim、快速退出输入。</div>
+        </div>
+        <div class="card">
+          <div class="kicker" data-i18n="demo_hold_k">Hold</div>
+          <div class="action" data-i18n="demo_hold_a">按住 → Hyper</div>
+          <div class="detail" data-i18n="demo_hold_d">Hyper = ⌘⌃⌥⇧，留给你的全局热键层。</div>
+        </div>
+      </div>
+
+      <div class="cta-row">
+        <a class="btn" id="download-btn" href="https://github.com/nixihz/capslock-bye/releases/latest/download/CapsLock-Bye-universal-notarized.dmg" data-i18n="cta">免费下载</a>
+        <span class="meta" data-i18n="cta_note">Universal DMG · Developer ID 已公证</span>
+      </div>
+      <p class="meta">
+        <a href="https://github.com/nixihz/capslock-bye/releases/latest" data-i18n="release_notes">版本说明</a>
+        · <a href="https://github.com/nixihz/capslock-bye/releases/latest/download/CapsLock-Bye-universal-notarized.dmg.sha256" data-i18n="checksum">SHA-256 校验文件</a>
+      </p>
+
+      <section id="permissions">
+        <h2 data-i18n="perm_title">权限两步</h2>
+        <div class="steps">
+          <div class="step">
+            <div class="num">1</div>
+            <div>
+              <h3 data-i18n="perm1_h">辅助功能</h3>
+              <p data-i18n="perm1_p">打开系统设置 → 隐私与安全性 → 辅助功能，打开 CapsLock Bye。列表没有时：在 Finder 显示应用，再点「+」添加。</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="num">2</div>
+            <div>
+              <h3 data-i18n="perm2_h">输入监控</h3>
+              <p data-i18n="perm2_p">同样打开「输入监控」。两项都绿，应用才会进入已开启；前台约每 2 秒自动刷新状态。</p>
+            </div>
+          </div>
+        </div>
+        <div class="fail">
+          <strong data-i18n="fail_title">常见失败态</strong>
+          <ul>
+            <li data-i18n="fail1">辅助功能未生效：关掉再开，或重试授权</li>
+            <li data-i18n="fail2">输入监控未生效：完全退出应用后重开</li>
+            <li data-i18n="fail3">键盘服务连不上：重启应用或注销再试</li>
+            <li data-i18n="fail4">被别的改键工具占住：先停 Karabiner 等再开</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="support">
+        <h2 data-i18n="tip_title">支持开发</h2>
+        <p class="meta" data-i18n="tip_body">软件免费，采用 MIT 开源许可证。欢迎在 GitHub 提交问题、改进建议或 Pull Request，也可以点一颗 Star 支持开发。</p>
+      </section>
+    </main>
+
+    <footer>
+      <div class="links">
+        <a href="#support" data-i18n="footer_tip">支持开发</a>
+        <a href="https://github.com/nixihz/capslock-bye" data-i18n="footer_source">源码 / GitHub</a>
+        <a href="https://github.com/nixihz/capslock-bye/issues" id="issues-link" data-i18n="footer_feedback">反馈 / Issues</a>
+      </div>
+      <div data-i18n="footer_copy">© CapsLock Bye · tech.keli.capslock-bye</div>
+    </footer>
+  </div>
+
+  <script>
+    const dict = {
+      zh: {
+        hero_title: "Caps Lock 终于有用了——轻点 Esc，按住变 Hyper",
+        hero_sub: "给 Mac 上写代码、用 Vim / Alfred / 自定义热键的人。本地运行，无账号，菜单栏即装即用。",
+        pill_local: "本地 · 无账号",
+        pill_free: "公证直链 · 免费装",
+        pill_os: "macOS 14+",
+        demo_tap_k: "Tap",
+        demo_tap_a: "轻点 → Esc",
+        demo_tap_d: "适合 Vim、快速退出输入。",
+        demo_hold_k: "Hold",
+        demo_hold_a: "按住 → Hyper",
+        demo_hold_d: "Hyper = ⌘⌃⌥⇧，留给你的全局热键层。",
+        cta: "免费下载",
+        cta_note: "Universal DMG · Developer ID 已公证",
+        release_notes: "版本说明",
+        checksum: "SHA-256 校验文件",
+        perm_title: "权限两步",
+        perm1_h: "辅助功能",
+        perm1_p: "打开系统设置 → 隐私与安全性 → 辅助功能，打开 CapsLock Bye。列表没有时：在 Finder 显示应用，再点「+」添加。",
+        perm2_h: "输入监控",
+        perm2_p: "同样打开「输入监控」。两项都绿，应用才会进入已开启；前台约每 2 秒自动刷新状态。",
+        fail_title: "常见失败态",
+        fail1: "辅助功能未生效：关掉再开，或重试授权",
+        fail2: "输入监控未生效：完全退出应用后重开",
+        fail3: "键盘服务连不上：重启应用或注销再试",
+        fail4: "被别的改键工具占住：先停 Karabiner 等再开",
+        tip_title: "支持开发",
+        tip_body: "软件免费，采用 MIT 开源许可证。欢迎在 GitHub 提交问题、改进建议或 Pull Request，也可以点一颗 Star 支持开发。",
+        footer_tip: "支持开发",
+        footer_source: "源码 / GitHub",
+        footer_feedback: "反馈 / Issues",
+        footer_copy: "© CapsLock Bye · tech.keli.capslock-bye"
+      },
+      en: {
+        hero_title: "Caps Lock, finally useful — tap Esc, hold Hyper",
+        hero_sub: "For Mac power users on Vim, Alfred, and custom hotkeys. Local, no account, menu-bar install.",
+        pill_local: "Local · no account",
+        pill_free: "Notarized · free download",
+        pill_os: "macOS 14+",
+        demo_tap_k: "Tap",
+        demo_tap_a: "Tap → Esc",
+        demo_tap_d: "Great for Vim and quick escapes.",
+        demo_hold_k: "Hold",
+        demo_hold_a: "Hold → Hyper",
+        demo_hold_d: "Hyper = ⌘⌃⌥⇧ for your global hotkey layer.",
+        cta: "Download free",
+        cta_note: "Universal DMG · Developer ID notarized",
+        release_notes: "Release notes",
+        checksum: "SHA-256 checksum",
+        perm_title: "Two permissions",
+        perm1_h: "Accessibility",
+        perm1_p: "System Settings → Privacy & Security → Accessibility, enable CapsLock Bye. Missing from the list? Reveal the app in Finder, then add it with +.",
+        perm2_h: "Input Monitoring",
+        perm2_p: "Enable Input Monitoring the same way. Both must be green before the app turns on; status refreshes about every 2s in the foreground.",
+        fail_title: "If something fails",
+        fail1: "Accessibility not taking effect: toggle off/on, then retry",
+        fail2: "Input Monitoring not taking effect: quit the app fully and reopen",
+        fail3: "Keyboard service unreachable: relaunch or log out/in",
+        fail4: "Another remapper holds the tap: pause Karabiner etc. first",
+        tip_title: "Support development",
+        tip_body: "Free and open source under the MIT license. Report bugs, suggest improvements, or send a pull request on GitHub. A star is also a welcome way to support development.",
+        footer_tip: "Support",
+        footer_source: "Source / GitHub",
+        footer_feedback: "Feedback / Issues",
+        footer_copy: "© CapsLock Bye · tech.keli.capslock-bye"
+      }
+    };
+
+    function setLang(lang) {
+      const pack = dict[lang] || dict.zh;
+      document.documentElement.lang = lang === "en" ? "en" : "zh-CN";
+      document.querySelectorAll("[data-i18n]").forEach((el) => {
+        const key = el.getAttribute("data-i18n");
+        if (pack[key]) el.textContent = pack[key];
+      });
+      document.getElementById("btn-zh").setAttribute("aria-pressed", lang === "zh" ? "true" : "false");
+      document.getElementById("btn-en").setAttribute("aria-pressed", lang === "en" ? "true" : "false");
+      try { localStorage.setItem("capslock-bye-lang", lang); } catch (_) {}
+    }
+
+    document.getElementById("btn-zh").addEventListener("click", () => setLang("zh"));
+    document.getElementById("btn-en").addEventListener("click", () => setLang("en"));
+    let initial = "zh";
+    try {
+      const saved = localStorage.getItem("capslock-bye-lang");
+      if (saved === "en" || saved === "zh") initial = saved;
+      else if (navigator.language && navigator.language.toLowerCase().startsWith("en")) initial = "en";
+    } catch (_) {}
+    setLang(initial);
+  </script>
+</body>
+</html>

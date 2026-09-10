@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Test and build universal macOS app
+    runs-on: macos-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Check toolchain and shell syntax
+        run: |
+          xcodebuild -version
+          swift --version
+          for script in script/*.sh; do bash -n "$script"; done
+          plutil -lint Resources/Info.plist
+      - name: Run tests
+        run: swift test
+      - name: Build without signing credentials
+        run: ./script/build_and_run.sh --ci
+      - name: Upload development build
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: CapsLock-Bye-ci-${{ github.sha }}
+          path: |
+            dist/ci/*-adhoc.zip
+            dist/ci/*-adhoc.zip.sha256
+          if-no-files-found: error
+          retention-days: 14

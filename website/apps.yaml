@@ -1,0 +1,15 @@
+name: capslock-bye
+title: CapsLock Bye
+title_i18n:
+  zh: CapsLock Bye
+  en: CapsLock Bye
+type: frontend
+version: 1.0.0
+route: /x/capslock-bye
+access: public
+entry: .
+author: brian
+description: 给 Mac 效率用户，让 Caps Lock 真正好用——轻点 Esc，按住变 Hyper。
+description_i18n:
+  zh: 给 Mac 效率用户，让 Caps Lock 真正好用——轻点 Esc，按住变 Hyper。
+  en: Tap Caps Lock for Esc. Hold for Hyper. A tiny Mac menu-bar app for keyboard power users.

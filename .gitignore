@@ -1,0 +1,18 @@
+.build/
+dist/
+.DS_Store
+.swiftpm/
+
+# Local design experiments and previously hosted release binaries.
+outputs/
+website/downloads/
+
+# Local credentials and signing material.
+.env
+.env.*
+!.env.example
+*.p12
+*.p8
+*.pfx
+*.keychain
+*.keychain-db

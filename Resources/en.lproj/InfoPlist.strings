@@ -1,0 +1,1 @@
+"NSInputMonitoringUsageDescription" = "CapsLock Bye detects Caps Lock press and release to distinguish a tap from a hold. No keystrokes are saved or sent.";

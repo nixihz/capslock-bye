@@ -1,0 +1,38 @@
+version: '3'
+
+tasks:
+  build:
+    desc: Build the app for this Mac (developer certificate or ad-hoc signing)
+    cmds:
+      - ./script/build_and_run.sh --build-only
+
+  test:
+    desc: Run the state machine and keyboard event tests
+    cmds:
+      - swift test
+
+  ci:
+    desc: Build a universal ad-hoc signed ZIP without signing credentials
+    cmds:
+      - ./script/build_and_run.sh --ci
+
+  release:
+    desc: Build a universal Release app with Developer ID and Hardened Runtime
+    cmds:
+      - ./script/build_and_run.sh --release
+
+  dmg:
+    desc: Build a signed universal DMG (not yet notarized)
+    deps: [release]
+    cmds:
+      - ./script/build_dmg.sh
+
+  notarize:
+    desc: Package the Release app as a DMG, notarize, staple, and verify
+    cmds:
+      - ./script/notarize.sh
+
+  notarize:resume:
+    desc: Resume the last DMG notarization submission and verify the result
+    cmds:
+      - ./script/notarize.sh --resume
