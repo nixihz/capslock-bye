@@ -11,7 +11,7 @@ ARCHIVE="CapsLock-Bye-$VERSION-universal.dmg"
 NOTARIZED_ARCHIVE="CapsLock-Bye-$VERSION-universal-notarized.dmg"
 # Separate DMG state from any older ZIP submission in this checkout.
 STATE_PREFIX="notarization-dmg"
-PROFILE="${CAPSBYE_NOTARY_PROFILE:-capsbye-notary}"
+PROFILE="${CAPSBYE_NOTARY_PROFILE:-caps-lock-bye-notary}"
 NOTARY_ARGS=(--keychain-profile "$PROFILE")
 if [ -n "${CAPSBYE_NOTARY_KEYCHAIN:-}" ]; then
     NOTARY_ARGS+=(--keychain "$CAPSBYE_NOTARY_KEYCHAIN")

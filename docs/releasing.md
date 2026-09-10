@@ -47,7 +47,7 @@ shasum -a 256 -c CapsLock-Bye-universal-notarized.dmg.sha256
 Store notarization credentials interactively, then build and notarize:
 
 ```sh
-xcrun notarytool store-credentials capsbye-notary --team-id YOUR_TEAM_ID
+xcrun notarytool store-credentials caps-lock-bye-notary --team-id YOUR_TEAM_ID
 ./script/build_and_run.sh --release
 ./script/notarize.sh
 ```
