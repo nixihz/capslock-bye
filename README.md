@@ -1,4 +1,4 @@
-# CapsLock Bye
+# CapsLock Bye 👋
 
 **Tap Caps Lock for Escape. Hold it for Hyper (⌘ ⌃ ⌥ ⇧).**
 
@@ -7,6 +7,8 @@
 [![CI](https://github.com/nixihz/capslock-bye/actions/workflows/ci.yml/badge.svg)](https://github.com/nixihz/capslock-bye/actions/workflows/ci.yml)
 
 A small, native macOS menu bar app. It processes keys locally without recording or uploading what you type. No account or driver required.
+
+![CapsLock Bye with mapping active: tap Caps Lock for Escape and hold for Hyper](docs/images/capslock-bye.webp)
 
 ## Features
 

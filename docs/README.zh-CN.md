@@ -1,4 +1,4 @@
-# CapsLock Bye
+# CapsLock Bye 👋
 
 **轻点 Caps Lock 发送 Esc，按住变成 Hyper（⌘ ⌃ ⌥ ⇧）。**
 
@@ -7,6 +7,8 @@
 [![CI](https://github.com/nixihz/capslock-bye/actions/workflows/ci.yml/badge.svg)](https://github.com/nixihz/capslock-bye/actions/workflows/ci.yml)
 
 一个轻巧的原生 macOS 菜单栏工具。按键在本机处理，不记录或上传输入内容，无需账号或驱动。
+
+![CapsLock Bye 主界面：映射已启用，轻点 Caps Lock 发送 Esc，按住变成 Hyper](images/capslock-bye.webp)
 
 ## 功能
 
