@@ -48,7 +48,7 @@ cd capslock-bye
 
 欢迎使用中文或英文提交问题和 Pull Request。开发命令及检查要求见 [CONTRIBUTING.md](../CONTRIBUTING.md)。
 
-GitHub Actions 负责构建和发布 DMG，维护者可参考 [发布指南](releasing.md)。
+GitHub Actions 在推送和 Pull Request 时运行测试并构建通用应用。可在 **Actions → CI → Run workflow** 手动构建开发版本，在 **Actions → Release → Run workflow** 发布已签名、公证的 DMG。签名密钥配置和版本要求见 [发布指南](releasing.md)。
 
 ## 许可证
 

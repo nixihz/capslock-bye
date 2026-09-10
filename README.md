@@ -48,7 +48,7 @@ The app is built at `dist/CapsLock Bye.app`. A developer certificate is optional
 
 Issues and pull requests are welcome in English or Chinese. See [CONTRIBUTING.md](CONTRIBUTING.md) for development commands and checks.
 
-GitHub Actions handles builds and DMG releases. Maintainers can follow the [release guide](docs/releasing.md).
+GitHub Actions tests and builds a universal app on pushes and pull requests. Use **Actions → CI → Run workflow** for a manual development build, or **Actions → Release → Run workflow** to publish a signed, notarized DMG. Maintainers can follow the [release guide](docs/releasing.md) for signing secrets and version requirements.
 
 ## License
 

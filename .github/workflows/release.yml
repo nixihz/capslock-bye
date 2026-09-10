@@ -3,12 +3,18 @@ name: Release
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version matching Resources/Info.plist (for example, 1.0.0)
+        required: true
+        type: string
 
 permissions:
   contents: read
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: release
   cancel-in-progress: false
 
 jobs:
@@ -28,37 +34,69 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
-      - name: Validate release version and credentials
+      - name: Validate release version
+        env:
+          VERSION_INPUT: ${{ inputs.version }}
+        run: |
+          version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' Resources/Info.plist)
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo 'Resources/Info.plist must use <major>.<minor>.<patch>.' >&2
+            exit 1
+          fi
+          tag="v$version"
+          if [[ "$GITHUB_EVENT_NAME" == workflow_dispatch ]]; then
+            if [[ "$GITHUB_REF" != refs/heads/main || "${VERSION_INPUT#v}" != "$version" ]]; then
+              echo 'Dispatch from main with a version matching Resources/Info.plist.' >&2
+              exit 1
+            fi
+          elif [[ "$GITHUB_REF_NAME" != "$tag" ]]; then
+            echo 'The version tag must match Resources/Info.plist.' >&2
+            exit 1
+          fi
+          source_commit=$(git rev-parse HEAD)
+          remote_tags=$(git ls-remote origin "refs/tags/$tag" "refs/tags/$tag^{}")
+          tag_commit=$(printf '%s\n' "$remote_tags" | awk '
+            /\^\{\}$/ { peeled = $1; next }
+            { tag = $1 }
+            END { print peeled ? peeled : tag }
+          ')
+          if [[ -n "$tag_commit" && "$tag_commit" != "$source_commit" ]]; then
+            echo "Tag $tag already points to a different commit." >&2
+            exit 1
+          fi
+          {
+            echo "CAPSBYE_VERSION=$version"
+            echo "CAPSBYE_TAG=$tag"
+            echo "CAPSBYE_SOURCE_COMMIT=$source_commit"
+          } >> "$GITHUB_ENV"
+      - name: Validate release credentials
         env:
           CERTIFICATE_BASE64: ${{ secrets.DEVELOPER_ID_CERTIFICATE_BASE64 }}
           CERTIFICATE_PASSWORD: ${{ secrets.DEVELOPER_ID_CERTIFICATE_PASSWORD }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_P8_BASE64 }}
+          API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
         run: |
-          version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' Resources/Info.plist)
-          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || [[ "$GITHUB_REF_NAME" != "v$version" ]]; then
-            echo 'The tag must be v<major>.<minor>.<patch> and match Resources/Info.plist.' >&2
-            exit 1
-          fi
-          for secret_name in CERTIFICATE_BASE64 CERTIFICATE_PASSWORD APPLE_ID APPLE_APP_SPECIFIC_PASSWORD APPLE_TEAM_ID; do
+          for secret_name in CERTIFICATE_BASE64 CERTIFICATE_PASSWORD API_KEY_BASE64 API_KEY_ID API_ISSUER_ID; do
             if [[ -z "${!secret_name}" ]]; then
               echo "Missing release credential: $secret_name. See docs/releasing.md." >&2
               exit 1
             fi
           done
-          echo "CAPSBYE_VERSION=$version" >> "$GITHUB_ENV"
       - name: Run tests
         run: swift test
       - name: Import signing and notarization credentials
         env:
           CERTIFICATE_BASE64: ${{ secrets.DEVELOPER_ID_CERTIFICATE_BASE64 }}
           CERTIFICATE_PASSWORD: ${{ secrets.DEVELOPER_ID_CERTIFICATE_PASSWORD }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_P8_BASE64 }}
+          API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
         run: |
+          umask 077
           certificate_path="$RUNNER_TEMP/capsbye-signing.p12"
+          api_key_path="$RUNNER_TEMP/capsbye-notary.p8"
+          trap 'rm -f "$certificate_path" "$api_key_path"' EXIT
           keychain_password=$(openssl rand -hex 32)
           echo "::add-mask::$keychain_password"
           printf '%s' "$CERTIFICATE_BASE64" | base64 --decode > "$certificate_path"
@@ -70,10 +108,17 @@ jobs:
           security set-key-partition-list -S apple-tool:,apple:,codesign: \
             -k "$keychain_password" "$CAPSBYE_NOTARY_KEYCHAIN" >/dev/null
           security list-keychains -d user -s "$CAPSBYE_NOTARY_KEYCHAIN"
+          signing_identity=$(security find-identity -v -p codesigning "$CAPSBYE_NOTARY_KEYCHAIN" \
+            | awk '/"Developer ID Application:/ && !identity { identity = $2 } END { print identity }')
+          if [[ -z "$signing_identity" ]]; then
+            echo 'No valid Developer ID Application identity was imported.' >&2
+            exit 1
+          fi
+          echo "CAPSBYE_SIGN_IDENTITY=$signing_identity" >> "$GITHUB_ENV"
+          printf '%s' "$API_KEY_BASE64" | base64 --decode > "$api_key_path"
           xcrun notarytool store-credentials "$CAPSBYE_NOTARY_PROFILE" \
-            --keychain "$CAPSBYE_NOTARY_KEYCHAIN" --apple-id "$APPLE_ID" \
-            --password "$APPLE_APP_SPECIFIC_PASSWORD" --team-id "$APPLE_TEAM_ID"
-          rm -f "$certificate_path"
+            --keychain "$CAPSBYE_NOTARY_KEYCHAIN" --key "$api_key_path" \
+            --key-id "$API_KEY_ID" --issuer "$API_ISSUER_ID"
       - name: Build signed universal app
         run: ./script/build_and_run.sh --release
       - name: Package DMG, notarize, and verify with Gatekeeper
@@ -91,17 +136,21 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          if gh release view "$GITHUB_REF_NAME" --json isDraft > "$RUNNER_TEMP/capsbye-release.json"; then
+          if gh release view "$CAPSBYE_TAG" --json isDraft > "$RUNNER_TEMP/capsbye-release.json"; then
             if [[ $(jq -r .isDraft "$RUNNER_TEMP/capsbye-release.json") != true ]]; then
               echo 'This release is already public. Publish a new version instead of replacing its assets.' >&2
               exit 1
             fi
           else
-            gh release create "$GITHUB_REF_NAME" --verify-tag --draft \
+            tag_args=(--verify-tag)
+            if [[ "$GITHUB_EVENT_NAME" == workflow_dispatch ]]; then
+              tag_args=(--target "$CAPSBYE_SOURCE_COMMIT")
+            fi
+            gh release create "$CAPSBYE_TAG" "${tag_args[@]}" --draft \
               --title "CapsLock Bye $CAPSBYE_VERSION" --generate-notes
           fi
-          gh release upload "$GITHUB_REF_NAME" dist/github-release/* --clobber
-          gh release edit "$GITHUB_REF_NAME" --draft=false --latest
+          gh release upload "$CAPSBYE_TAG" dist/github-release/* --clobber
+          gh release edit "$CAPSBYE_TAG" --draft=false --latest
       - name: Save notarization diagnostics
         if: failure()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -116,4 +165,4 @@ jobs:
           if [[ -f "$CAPSBYE_NOTARY_KEYCHAIN" ]]; then
             security delete-keychain "$CAPSBYE_NOTARY_KEYCHAIN"
           fi
-          rm -f "$RUNNER_TEMP/capsbye-signing.p12"
+          rm -f "$RUNNER_TEMP/capsbye-signing.p12" "$RUNNER_TEMP/capsbye-notary.p8"
