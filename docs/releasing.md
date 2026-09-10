@@ -61,15 +61,17 @@ Download `CapsLock-Bye-ci-<commit>` from the completed run's **Artifacts** secti
 
 The release workflow tests, builds both architectures, signs, notarizes, and verifies the DMG. It uploads all assets to a draft release before making it public. Versions must match the plist and use `<major>.<minor>.<patch>` (an optional `v` prefix is accepted for manual requests). Manual releases must run from `main`; an existing version tag must point to the checked-out commit. Release jobs run one at a time, including tag and manual triggers. Forks must update the workflow's repository check to publish their own releases.
 
-Each release includes versioned and stable DMG filenames with SHA-256 checksums. The website and READMEs use these stable links, which become available after the first release:
+Publish only the versioned DMG and its matching SHA-256 checksum:
 
-- [Latest DMG](https://github.com/nixihz/capslock-bye/releases/latest/download/CapsLock-Bye-universal-notarized.dmg)
-- [SHA-256 checksum](https://github.com/nixihz/capslock-bye/releases/latest/download/CapsLock-Bye-universal-notarized.dmg.sha256)
+- `CapsLock-Bye-<version>-universal-notarized.dmg`
+- `CapsLock-Bye-<version>-universal-notarized.dmg.sha256`
 
-Download both files to the same directory to verify:
+The website and READMEs link to the [latest release page](https://github.com/nixihz/capslock-bye/releases/latest), where users select the versioned installer. Do not upload a second copy with an unversioned filename.
+
+Download both files to the same directory to verify, replacing `1.0.0` with the downloaded version:
 
 ```sh
-shasum -a 256 -c CapsLock-Bye-universal-notarized.dmg.sha256
+shasum -a 256 -c CapsLock-Bye-1.0.0-universal-notarized.dmg.sha256
 ```
 
 ## Local packaging

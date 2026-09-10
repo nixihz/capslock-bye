@@ -21,12 +21,12 @@
 
 需要 **macOS 14 或更新版本**，支持 Apple Silicon 和 Intel。
 
-1. [下载 DMG](https://github.com/nixihz/capslock-bye/releases/latest/download/CapsLock-Bye-universal-notarized.dmg)。
+1. 前往[最新版本页面](https://github.com/nixihz/capslock-bye/releases/latest)，下载带版本号的 `.dmg` 安装包。
 2. 打开后，将 **CapsLock Bye.app** 拖到 **Applications（应用程序）**，再推出磁盘映像。
 3. 启动应用，按引导在 **系统设置 → 隐私与安全性** 中开启 **辅助功能** 和 **输入监控**。
 4. 如果 macOS 要求，重新打开应用；开启映射后，通过试键区检查效果。
 
-正式 DMG 已签名并完成 Apple 公证，附有 [SHA-256 校验文件](https://github.com/nixihz/capslock-bye/releases/latest/download/CapsLock-Bye-universal-notarized.dmg.sha256)。下载链接在首次发布后生效；在此之前可按下方说明从源码构建。
+正式 DMG 已签名并完成 Apple 公证。每个版本提供带版本号的安装包及对应的 `.dmg.sha256` 校验文件。
 
 ## 使用
 

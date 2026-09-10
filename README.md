@@ -21,12 +21,12 @@ A small, native macOS menu bar app. It processes keys locally without recording 
 
 Requires **macOS 14 or later**, on Apple Silicon or Intel.
 
-1. [Download the DMG](https://github.com/nixihz/capslock-bye/releases/latest/download/CapsLock-Bye-universal-notarized.dmg).
+1. Open the [latest release](https://github.com/nixihz/capslock-bye/releases/latest) and download the versioned `.dmg` asset.
 2. Open it, drag **CapsLock Bye.app** to **Applications**, then eject the disk image.
 3. Launch the app and follow its guide to enable **Accessibility** and **Input Monitoring** in **System Settings → Privacy & Security**.
 4. Reopen the app if macOS asks, enable mapping, and try the key tester.
 
-Release DMGs are signed and Apple notarized, with [SHA-256 checksums](https://github.com/nixihz/capslock-bye/releases/latest/download/CapsLock-Bye-universal-notarized.dmg.sha256). Downloads become available after the first release; until then, build from source below.
+Release DMGs are signed and Apple notarized. Each release includes a matching `.dmg.sha256` checksum file alongside the versioned installer.
 
 ## Use
 

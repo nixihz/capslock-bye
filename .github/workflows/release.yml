@@ -123,14 +123,14 @@ jobs:
         run: ./script/build_and_run.sh --release
       - name: Package DMG, notarize, and verify with Gatekeeper
         run: ./script/notarize.sh
-      - name: Prepare versioned and stable download assets
+      - name: Prepare versioned download assets
         run: |
           mkdir -p dist/github-release
           cp "dist/release/CapsLock-Bye-$CAPSBYE_VERSION-universal-notarized.dmg" dist/github-release/
           cd dist/github-release
-          cp "CapsLock-Bye-$CAPSBYE_VERSION-universal-notarized.dmg" CapsLock-Bye-universal-notarized.dmg
-          for archive in *.dmg; do shasum -a 256 "$archive" > "$archive.sha256"; done
-          for checksum in *.sha256; do shasum -a 256 -c "$checksum"; done
+          archive="CapsLock-Bye-$CAPSBYE_VERSION-universal-notarized.dmg"
+          shasum -a 256 "$archive" > "$archive.sha256"
+          shasum -a 256 -c "$archive.sha256"
       - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -149,7 +149,8 @@ jobs:
             gh release create "$CAPSBYE_TAG" "${tag_args[@]}" --draft \
               --title "CapsLock Bye $CAPSBYE_VERSION" --generate-notes
           fi
-          gh release upload "$CAPSBYE_TAG" dist/github-release/* --clobber
+          archive="dist/github-release/CapsLock-Bye-$CAPSBYE_VERSION-universal-notarized.dmg"
+          gh release upload "$CAPSBYE_TAG" "$archive" "$archive.sha256" --clobber
           gh release edit "$CAPSBYE_TAG" --draft=false --latest
       - name: Save notarization diagnostics
         if: failure()
