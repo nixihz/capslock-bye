@@ -1,45 +1,65 @@
 import AppKit
 
-// A native vector keycap mark. Re-run with `swift script/generate_icon.swift`.
+// Package the approved artwork into transparent macOS icons.
+// Re-run with `swift script/generate_icon.swift` from the project root.
 let root = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+let sourceURL = root.appendingPathComponent("Resources/AppIconSource.png")
+guard let source = NSImage(contentsOf: sourceURL) else {
+    fatalError("Cannot load \(sourceURL.path)")
+}
+source.size = NSSize(width: 1254, height: 1254)
+
+// The approved image has a studio backdrop. Clip to the key's rounded outline
+// while preserving the original glass, glyph, and wave pixels inside it.
+// Coordinates use AppKit's bottom-left origin on the 1254 px source canvas.
+let keyBounds = NSRect(x: 195, y: 404, width: 873, height: 484)
 let iconset = root.appendingPathComponent(".build/AppIcon.iconset")
 try FileManager.default.createDirectory(at: iconset, withIntermediateDirectories: true)
+
 for size in [16, 32, 128, 256, 512] {
     for scale in [1, 2] {
         let pixels = size * scale
-        let image = NSImage(size: NSSize(width: pixels, height: pixels))
-        image.lockFocus()
-        let p = CGFloat(pixels)
-        let rect = NSRect(x: p * 0.055, y: p * 0.055, width: p * 0.89, height: p * 0.89)
-        NSColor(red: 0.9, green: 0.94, blue: 0.9, alpha: 1).setFill()
-        NSBezierPath(roundedRect: rect, xRadius: p * 0.21, yRadius: p * 0.21).fill()
-        let key = NSRect(x: p * 0.19, y: p * 0.205, width: p * 0.62, height: p * 0.62)
-        let shadow = NSShadow()
-        shadow.shadowColor = NSColor.black.withAlphaComponent(0.14)
-        shadow.shadowBlurRadius = p * 0.04
-        shadow.shadowOffset = NSSize(width: 0, height: -p * 0.02)
+        let bitmap = NSBitmapImageRep(
+            bitmapDataPlanes: nil, pixelsWide: pixels, pixelsHigh: pixels,
+            bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true,
+            isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0
+        )!
+        let context = NSGraphicsContext(bitmapImageRep: bitmap)!
         NSGraphicsContext.saveGraphicsState()
+        NSGraphicsContext.current = context
+        context.imageInterpolation = .high
+
+        let p = CGFloat(pixels)
+        let artworkScale = p * 0.9 / keyBounds.width
+        let keySize = NSSize(width: p * 0.9, height: keyBounds.height * artworkScale)
+        let destination = NSRect(
+            x: (p - keySize.width) / 2, y: (p - keySize.height) / 2,
+            width: keySize.width, height: keySize.height
+        )
+        let outline = NSBezierPath(
+            roundedRect: destination,
+            xRadius: 69 * artworkScale, yRadius: 69 * artworkScale
+        )
+
+        NSGraphicsContext.saveGraphicsState()
+        let shadow = NSShadow()
+        shadow.shadowColor = NSColor.black.withAlphaComponent(0.17)
+        shadow.shadowBlurRadius = p * 0.018
+        shadow.shadowOffset = NSSize(width: 0, height: -p * 0.012)
         shadow.set()
-        NSColor(red: 0.97, green: 0.98, blue: 0.95, alpha: 1).setFill()
-        NSBezierPath(roundedRect: key, xRadius: p * 0.12, yRadius: p * 0.12).fill()
+        NSColor.white.setFill()
+        outline.fill()
         NSGraphicsContext.restoreGraphicsState()
-        if let symbol = NSImage(systemSymbolName: "capslock", accessibilityDescription: nil)?.withSymbolConfiguration(.init(pointSize: p * 0.34, weight: .medium)) {
-            let tinted = NSImage(size: symbol.size)
-            tinted.lockFocus()
-            symbol.draw(at: .zero, from: .zero, operation: .sourceOver, fraction: 1)
-            NSColor(red: 0.19, green: 0.44, blue: 0.34, alpha: 1).setFill()
-            NSRect(origin: .zero, size: symbol.size).fill(using: .sourceAtop)
-            tinted.unlockFocus()
-            let width = p * 0.38
-            let height = width * symbol.size.height / symbol.size.width
-            tinted.draw(in: NSRect(x: (p - width) / 2, y: (p - height) / 2, width: width, height: height))
-        }
-        image.unlockFocus()
-        let bitmap = NSBitmapImageRep(data: image.tiffRepresentation!)!
+
+        outline.addClip()
+        source.draw(in: destination, from: keyBounds, operation: .sourceOver, fraction: 1)
+        NSGraphicsContext.restoreGraphicsState()
+
         let filename = "icon_\(size)x\(size)\(scale == 2 ? "@2x" : "").png"
         try bitmap.representation(using: .png, properties: [:])!.write(to: iconset.appendingPathComponent(filename))
     }
 }
+
 let task = Process()
 task.executableURL = URL(fileURLWithPath: "/usr/bin/iconutil")
 task.arguments = ["-c", "icns", iconset.path, "-o", root.appendingPathComponent("Resources/AppIcon.icns").path]

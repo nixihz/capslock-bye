@@ -66,6 +66,9 @@ BUILD_BINARY="$(swift build "${BUILD_ARGS[@]}" --show-bin-path)/CapsBye"
 if [ "$MODE" = --release ] || [ "$MODE" = --ci ]; then
     lipo "$BUILD_BINARY" -verify_arch arm64 x86_64
 fi
+if [ ! -f Resources/AppIcon.icns ] || [ Resources/AppIconSource.png -nt Resources/AppIcon.icns ] || [ script/generate_icon.swift -nt Resources/AppIcon.icns ]; then
+    swift script/generate_icon.swift
+fi
 mkdir -p "$APP_BUNDLE/Contents/MacOS" "$APP_BUNDLE/Contents/Resources"
 cp "$BUILD_BINARY" "$APP_BINARY"
 cp Resources/Info.plist "$APP_BUNDLE/Contents/Info.plist"

@@ -12,7 +12,9 @@ struct MainView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 8) {
-                Image(systemName: "capslock").font(.system(size: 13, weight: .medium)).foregroundStyle(.secondary)
+                Image(nsImage: NSImage(named: "AppIcon") ?? NSApplication.shared.applicationIconImage)
+                    .resizable().interpolation(.high).scaledToFit()
+                    .frame(width: 32, height: 24).accessibilityHidden(true)
                 Text("CapsLock Bye").font(.system(size: 15, weight: .semibold)).tracking(-0.4)
                 Spacer()
                 Toggle(model.t("开启映射", "Enable mapping"), isOn: $model.enabled)

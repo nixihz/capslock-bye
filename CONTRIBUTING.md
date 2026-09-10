@@ -22,6 +22,8 @@ swift test                              # State machine and keyboard event tests
 
 [Task](https://taskfile.dev/) is optional: `task build`, `task test`, and `task ci` wrap the same commands. Set `CAPSBYE_SIGN_IDENTITY` to a certificate's name or SHA-1 to select it, or `-` for ad-hoc signing.
 
+The approved logo artwork is `Resources/AppIconSource.png`. The build script regenerates `Resources/AppIcon.icns` when the artwork or `script/generate_icon.swift` changes. Run `swift script/generate_icon.swift` to regenerate it explicitly. The icon script clips the artwork's studio background and preserves the wide glass key on a transparent square canvas; adjust its source bounds if replacing the artwork.
+
 ## Check your change
 
 Run `swift test` and `./script/build_and_run.sh --ci` before opening a pull request. CI runs both commands; its development artifacts are not notarized. Keyboard event tests use a replacement output sink and do not send keystrokes to your desktop.
