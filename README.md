@@ -34,6 +34,8 @@ Close the window to keep the app in the menu bar. Left-click its icon to reopen 
 
 Disable other tools' Caps Lock mappings and keep Caps Lock at its default in keyboard firmware and system settings. Mapping pauses while macOS Secure Input is active, such as in some password fields, and resumes afterward.
 
+Accessible physical and virtual keyboards can work together. Connecting a mouse with a keyboard interface does not replace the Caps Lock input source or interrupt a held shortcut on another device. Temporary keyboard connection failures are retried automatically.
+
 ## Build from source
 
 Requires **Xcode 26 or later**, including the macOS 26 SDK and Swift 6.

@@ -188,7 +188,11 @@ final class AppModel: ObservableObject {
         let shouldRun = enabled && authorized && !secureInput && !sleeping && !recording
         if !shouldRun {
             if engine.isRunning { engine.stop() }
-        } else if !engine.isRunning && failure == nil {
+        } else if !engine.isRunning {
+            // Device ownership can change after launch (for example while a
+            // virtual keyboard driver is starting). Do not leave a transient
+            // start failure latched until the user relaunches the app.
+            failure = nil
             do { try engine.start() }
             catch { failure = error as? KeyboardEngine.Failure ?? .eventTap }
         }

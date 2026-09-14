@@ -41,13 +41,16 @@ final class KeyboardEngine {
     private let eventSink: ((CGEvent, CGEventTapProxy?) -> Void)?
     private let now: () -> TimeInterval
     private let modifierSnapshot: (() -> Modifiers)?
+    private let capsSnapshot: (() -> Set<UInt64>)?
 
     init(eventSink: ((CGEvent, CGEventTapProxy?) -> Void)? = nil,
          now: @escaping () -> TimeInterval = { ProcessInfo.processInfo.systemUptime },
-         modifierSnapshot: (() -> Modifiers)? = nil) {
+         modifierSnapshot: (() -> Modifiers)? = nil,
+         capsSnapshot: (() -> Set<UInt64>)? = nil) {
         self.eventSink = eventSink
         self.now = now
         self.modifierSnapshot = modifierSnapshot
+        self.capsSnapshot = capsSnapshot
     }
 
     func start() throws {
@@ -158,15 +161,16 @@ final class KeyboardEngine {
         let keys = (IOHIDDeviceCopyMatchingElements(device, [kIOHIDElementUsagePageKey: kHIDPage_KeyboardOrKeypad] as CFDictionary, 0) as? [IOHIDElement]) ?? []
         let modifiers = keys.filter { (0xE0...0xE7).contains(IOHIDElementGetUsage($0)) }
         keyboards[deviceID(device)] = Keyboard(device: device, elements: elements, modifiers: modifiers, virtual: virtual)
+        logger.notice("Keyboard connected: \(product, privacy: .public), id=\(self.deviceID(device), privacy: .public), virtual=\(virtual, privacy: .public)")
         selectDevices()
     }
 
     private func disconnect(_ device: IOHIDDevice) {
         let id = deviceID(device)
         guard let keyboard = keyboards.removeValue(forKey: id) else { return }
-        cancelPress()
         IOHIDDeviceUnscheduleFromRunLoop(keyboard.device, CFRunLoopGetMain(), CFRunLoopMode.commonModes.rawValue)
         IOHIDDeviceClose(keyboard.device, IOOptionBits(kIOHIDOptionsTypeNone))
+        logger.notice("Keyboard disconnected: \(id, privacy: .public)")
         selectDevices()
         if isRunning && capsElements.isEmpty {
             DispatchQueue.main.async { [weak self] in self?.onInterruption?() }
@@ -174,15 +178,30 @@ final class KeyboardEngine {
     }
 
     private func selectDevices() {
-        // Do not count the same press twice via a real and a virtual keyboard.
+        // A mouse can advertise a full keyboard interface. Its presence must
+        // not hide a virtual keyboard forwarding a seized physical keyboard.
         let physical = keyboards.filter { !$0.value.virtual }
-        let selected = physical.isEmpty ? keyboards : physical
-        let next = Set(selected.keys)
-        if next != selectedDevices { cancelPress(); hasReceivedCaps = false }
+        capsElements = keyboards.values.flatMap(\.elements)
+        modifierElements = keyboards.values.flatMap(\.modifiers)
+        updateDevices(physical: Set(physical.keys), virtual: Set(keyboards.keys).subtracting(physical.keys))
+    }
+
+    /// Shared by HID discovery and device-lifecycle tests.
+    func updateDevices(physical: Set<UInt64>, virtual: Set<UInt64>) {
+        let next = physical.union(virtual)
+        let removed = selectedDevices.subtracting(next)
+        if !downDevices.isDisjoint(with: removed) {
+            downDevices.subtract(removed)
+            // A disappearing input cancels its press without generating Esc.
+            // Other devices arriving/leaving must not interrupt a held chord.
+            if downDevices.isEmpty { cancelPress() }
+        }
+        if next != selectedDevices {
+            logger.notice("Keyboard inputs: \(physical.count, privacy: .public) physical, \(virtual.count, privacy: .public) virtual")
+        }
         selectedDevices = next
-        capsElements = selected.values.flatMap(\.elements)
-        modifierElements = selected.values.flatMap(\.modifiers)
-        usingVirtualKeyboard = physical.isEmpty && !selected.isEmpty
+        if next.isEmpty { hasReceivedCaps = false }
+        usingVirtualKeyboard = !virtual.isEmpty
     }
 
     private func deviceID(_ device: IOHIDDevice) -> UInt64 {
@@ -198,9 +217,14 @@ final class KeyboardEngine {
               IOHIDElementGetUsage(element) == kHIDUsage_KeyboardCapsLock else { return }
         let device = IOHIDElementGetDevice(element)
         let id = deviceID(device)
-        guard selectedDevices.contains(id) else { return }
-        if IOHIDValueGetIntegerValue(value) != 0 { downDevices.insert(id) }
-        else { downDevices.remove(id) }
+        receiveCaps(deviceID: id, isDown: IOHIDValueGetIntegerValue(value) != 0)
+    }
+
+    /// Accept only connected inputs, regardless of callback ordering.
+    func receiveCaps(deviceID: UInt64, isDown: Bool) {
+        guard selectedDevices.contains(deviceID) else { return }
+        if isDown { downDevices.insert(deviceID) }
+        else { downDevices.remove(deviceID) }
         updatePress(isDown: !downDevices.isEmpty)
     }
 
@@ -208,10 +232,13 @@ final class KeyboardEngine {
     /// in either order. A physical key value, never the sticky alphaShift flag,
     /// is the source of truth.
     private func synchronizeCaps() {
-        var pressed: Set<UInt64> = []
-        for element in capsElements where isDown(element) {
-            pressed.insert(deviceID(IOHIDElementGetDevice(element)))
+        var pressed = capsSnapshot?() ?? []
+        if capsSnapshot == nil {
+            for element in capsElements where isDown(element) {
+                pressed.insert(deviceID(IOHIDElementGetDevice(element)))
+            }
         }
+        pressed.formIntersection(selectedDevices)
         // Only advance presses here. Releases stay ordered with their HID
         // callback so a fast rolled chord cannot accidentally produce Escape.
         if !pressed.isEmpty {
@@ -252,6 +279,7 @@ final class KeyboardEngine {
 
     private func handle(proxy: CGEventTapProxy, type: CGEventType, event: CGEvent) -> Unmanaged<CGEvent>? {
         if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
+            logger.notice("Event tap interrupted: \(type.rawValue, privacy: .public)")
             cancelPress()
             // Let the owner re-check permissions and rebuild both listeners.
             DispatchQueue.main.async { [weak self] in self?.onInterruption?() }
@@ -352,7 +380,11 @@ final class KeyboardEngine {
 
     private func isDown(_ element: IOHIDElement) -> Bool {
         withUnsafeTemporaryAllocation(of: Unmanaged<IOHIDValue>.self, capacity: 1) { buffer in
-            guard IOHIDDeviceGetValue(IOHIDElementGetDevice(element), element, buffer.baseAddress!) == kIOReturnSuccess else { return false }
+            // Keep the ordering fallback even when HID callbacks lag behind
+            // Quartz. Explicitly request the latest cached input value; never
+            // send a synchronous report request to the keyboard.
+            guard IOHIDDeviceGetValueWithOptions(IOHIDElementGetDevice(element), element, buffer.baseAddress!,
+                IOHIDDeviceGetValueOptions.withoutUpdate.rawValue) == kIOReturnSuccess else { return false }
             return IOHIDValueGetIntegerValue(buffer[0].takeUnretainedValue()) != 0
         }
     }
