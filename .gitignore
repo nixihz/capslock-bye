@@ -5,7 +5,12 @@ dist/
 
 # Local design experiments and previously hosted release binaries.
 outputs/
-website/downloads/
+# Keep notarized binaries for keli-apps hosting; ignore other scratch.
+website/downloads/*
+!website/downloads/.gitkeep.txt
+!website/downloads/*.zip
+!website/downloads/*.dmg
+!website/downloads/*.sha256
 
 # Local credentials and signing material.
 .env

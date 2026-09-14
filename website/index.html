@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CapsLock Bye — Tap Esc · Hold Hyper</title>
   <meta name="description" content="给 Mac 效率用户，让 Caps Lock 真正好用——轻点 Esc，按住变 Hyper。本地、无账号、Apple 公证、免费安装。">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-WJEFXV72R3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-WJEFXV72R3');
+  </script>
   <style>
     :root {
       --bg: #0f1115;
@@ -112,6 +119,23 @@
       border: 1px solid var(--line); background: rgba(255,255,255,0.02);
     }
     #support h2 { margin-bottom: 8px; }
+    .tip-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .tip-card { text-align: center; }
+    .tip-qr {
+      margin: 10px auto 0;
+      display: block;
+      border-radius: 8px;
+      background: #fff;
+      object-fit: contain;
+    }
+    .tip-qr.missing { display: none; }
+    .tip-placeholder { margin-top: 10px; }
+    #tip-intl-link { display: inline-block; margin-top: 10px; font-weight: 650; }
     .hidden { display: none !important; }
   </style>
 </head>
@@ -131,6 +155,7 @@
       <ul class="pills">
         <li data-i18n="pill_local">本地 · 无账号</li>
         <li data-i18n="pill_free">Apple 公证 · 免费安装</li>
+        <li data-i18n="pill_oss">开源</li>
         <li data-i18n="pill_os">macOS 14+</li>
       </ul>
 
@@ -148,11 +173,12 @@
       </div>
 
       <div class="cta-row">
-        <a class="btn" id="download-btn" href="https://github.com/nixihz/capslock-bye/releases/latest" data-i18n="cta">免费下载</a>
+        <a class="btn" id="download-btn" href="./downloads/CapsLock-Bye-1.0.0-universal-notarized.dmg" data-i18n="cta">免费下载</a>
         <span class="meta" data-i18n="cta_note">Universal DMG · Developer ID 已公证</span>
       </div>
+      <p class="meta">SHA256 <code id="sha">6e30715d1582025c5e11c521c0ab14f7a76a17b8bb71191c9e3f738363a2245e</code></p>
       <p class="meta">
-        <a href="https://github.com/nixihz/capslock-bye/releases/latest" data-i18n="release_notes">版本说明与 SHA-256 校验文件</a>
+        <a href="https://github.com/nixihz/capslock-bye" data-i18n="release_notes">开源仓库</a>
       </p>
 
       <section id="permissions">
@@ -184,9 +210,16 @@
         </div>
       </section>
 
-      <section id="support">
+            <section id="support">
         <h2 data-i18n="tip_title">支持开发</h2>
-        <p class="meta" data-i18n="tip_body">软件免费，采用 MIT 开源许可证。欢迎在 GitHub 提交问题、改进建议或 Pull Request，也可以点一颗 Star 支持开发。</p>
+        <p class="meta" data-i18n="tip_body">软件免费，MIT 开源。打赏不绑定下载；GitHub Sponsors 不开。也可以提 Issue / PR，或点一颗 Star。</p>
+        <div class="tip-grid">
+          <div class="card tip-card">
+            <div class="kicker" data-i18n="tip_wechat">微信</div>
+            <img class="tip-qr" src="./assets/wechat-qr.png" width="140" height="140" alt="WeChat tip QR" onerror="this.classList.add('missing'); this.nextElementSibling.hidden=false;">
+            <p class="meta tip-placeholder" hidden data-i18n="tip_qr_pending">二维码待放</p>
+          </div>
+        </div>
       </section>
     </main>
 
@@ -207,6 +240,7 @@
         hero_sub: "给 Mac 上写代码、用 Vim / Alfred / 自定义热键的人。本地运行，无账号，菜单栏即装即用。",
         pill_local: "本地 · 无账号",
         pill_free: "Apple 公证 · 免费安装",
+        pill_oss: "开源",
         pill_os: "macOS 14+",
         demo_tap_k: "Tap",
         demo_tap_a: "轻点 → Esc",
@@ -216,7 +250,7 @@
         demo_hold_d: "Hyper = ⌘⌃⌥⇧，留给你的全局热键层。",
         cta: "免费下载",
         cta_note: "Universal DMG · Developer ID 已公证",
-        release_notes: "版本说明与 SHA-256 校验文件",
+        release_notes: "开源仓库",
         perm_title: "权限两步",
         perm1_h: "辅助功能",
         perm1_p: "打开系统设置 → 隐私与安全性 → 辅助功能，打开 CapsLock Bye。列表没有时：在 Finder 显示应用，再点「+」添加。",
@@ -228,7 +262,9 @@
         fail3: "键盘服务连不上：重启应用或注销再试",
         fail4: "被别的改键工具占住：先停 Karabiner 等再开",
         tip_title: "支持开发",
-        tip_body: "软件免费，采用 MIT 开源许可证。欢迎在 GitHub 提交问题、改进建议或 Pull Request，也可以点一颗 Star 支持开发。",
+        tip_body: "软件免费，MIT 开源。打赏不绑定下载；GitHub Sponsors 不开。也可以提 Issue / PR，或点一颗 Star。",
+        tip_wechat: "微信",
+        tip_qr_pending: "二维码待放",
         footer_tip: "支持开发",
         footer_source: "源码 / GitHub",
         footer_feedback: "反馈 / Issues",
@@ -239,6 +275,7 @@
         hero_sub: "For Mac power users on Vim, Alfred, and custom hotkeys. Local, no account, menu-bar install.",
         pill_local: "Local · no account",
         pill_free: "Notarized · free download",
+        pill_oss: "Open source",
         pill_os: "macOS 14+",
         demo_tap_k: "Tap",
         demo_tap_a: "Tap → Esc",
@@ -248,7 +285,7 @@
         demo_hold_d: "Hyper = ⌘⌃⌥⇧ for your global hotkey layer.",
         cta: "Download free",
         cta_note: "Universal DMG · Developer ID notarized",
-        release_notes: "Release notes and SHA-256 checksum",
+        release_notes: "Open-source repo",
         perm_title: "Two permissions",
         perm1_h: "Accessibility",
         perm1_p: "System Settings → Privacy & Security → Accessibility, enable CapsLock Bye. Missing from the list? Reveal the app in Finder, then add it with +.",
@@ -260,7 +297,9 @@
         fail3: "Keyboard service unreachable: relaunch or log out/in",
         fail4: "Another remapper holds the tap: pause Karabiner etc. first",
         tip_title: "Support development",
-        tip_body: "Free and open source under the MIT license. Report bugs, suggest improvements, or send a pull request on GitHub. A star is also a welcome way to support development.",
+        tip_body: "Free under MIT. Tip below never gates the download; GitHub Sponsors stays off. Issues, PRs, and stars welcome.",
+        tip_wechat: "WeChat",
+        tip_qr_pending: "QR coming soon",
         footer_tip: "Support",
         footer_source: "Source / GitHub",
         footer_feedback: "Feedback / Issues",
