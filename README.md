@@ -2,7 +2,7 @@
 
 **Tap Caps Lock for Escape. Hold it for Hyper (⌘ ⌃ ⌥ ⇧).**
 
-[简体中文](docs/README.zh-CN.md) · [Download](https://github.com/nixihz/capslock-bye/releases/latest) · [Issues](https://github.com/nixihz/capslock-bye/issues)
+[简体中文](docs/README.zh-CN.md) · [Website](https://capslock-bye.keli.tech/) · [Download](https://github.com/nixihz/capslock-bye/releases/latest) · [Issues](https://github.com/nixihz/capslock-bye/issues)
 
 [![CI](https://github.com/nixihz/capslock-bye/actions/workflows/ci.yml/badge.svg)](https://github.com/nixihz/capslock-bye/actions/workflows/ci.yml)
 

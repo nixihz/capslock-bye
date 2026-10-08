@@ -1,333 +1,585 @@
 <!doctype html>
 <html lang="zh-CN">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>CapsLock Bye — Tap Esc · Hold Hyper</title>
-  <meta name="description" content="给 Mac 效率用户，让 Caps Lock 真正好用——轻点 Esc，按住变 Hyper。本地、无账号、Apple 公证、免费安装。">
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-WJEFXV72R3"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-WJEFXV72R3');
-  </script>
-  <style>
-    :root {
-      --bg: #0f1115;
-      --fg: #f2f3f5;
-      --muted: #9aa3b2;
-      --card: #1a1d24;
-      --line: #2a2f3a;
-      --accent: #6ea8fe;
-      --ok: #3dd68c;
-      --radius: 14px;
-      --max: 720px;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", sans-serif;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: radial-gradient(1200px 600px at 50% -10%, #1c2436 0%, var(--bg) 55%);
-      color: var(--fg);
-      line-height: 1.55;
-      min-height: 100vh;
-    }
-    a { color: var(--accent); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    .wrap { max-width: var(--max); margin: 0 auto; padding: 28px 20px 64px; }
-    header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 48px;
-    }
-    .brand { font-weight: 650; letter-spacing: -0.02em; }
-    .lang {
-      display: inline-flex; gap: 4px; border: 1px solid var(--line);
-      border-radius: 999px; padding: 2px; background: var(--card);
-    }
-    .lang button {
-      border: 0; background: transparent; color: var(--muted);
-      padding: 6px 12px; border-radius: 999px; cursor: pointer; font: inherit;
-    }
-    .lang button[aria-pressed="true"] {
-      background: #2b3344; color: var(--fg);
-    }
-    h1 {
-      font-size: clamp(1.7rem, 4vw, 2.35rem);
-      line-height: 1.2; letter-spacing: -0.03em; margin: 0 0 14px;
-    }
-    .sub { color: var(--muted); margin: 0 0 28px; font-size: 1.05rem; }
-    .pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 28px; padding: 0; list-style: none; }
-    .pills li {
-      font-size: 0.85rem; color: var(--muted);
-      border: 1px solid var(--line); border-radius: 999px;
-      padding: 4px 10px; background: rgba(255,255,255,0.02);
-    }
-    .demo {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 28px;
-    }
-    @media (max-width: 560px) { .demo { grid-template-columns: 1fr; } }
-    .card {
-      background: var(--card); border: 1px solid var(--line);
-      border-radius: var(--radius); padding: 18px 16px;
-    }
-    .card .kicker { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
-    .card .action { font-size: 1.25rem; font-weight: 650; margin-top: 6px; }
-    .card .detail { color: var(--muted); font-size: 0.92rem; margin-top: 6px; }
-    .cta-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 10px; }
-    .btn {
-      display: inline-flex; align-items: center; justify-content: center;
-      background: var(--fg); color: #111; font-weight: 650;
-      border-radius: 12px; padding: 12px 18px; border: 0;
-      text-decoration: none; font-size: 1rem;
-    }
-    .btn:hover { filter: brightness(0.95); text-decoration: none; }
-    .meta { color: var(--muted); font-size: 0.88rem; }
-    .meta code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 0.8rem; word-break: break-all;
-    }
-    section { margin-top: 48px; }
-    section h2 { font-size: 1.2rem; margin: 0 0 14px; letter-spacing: -0.02em; }
-    .steps { display: grid; gap: 12px; }
-    .step {
-      display: grid; grid-template-columns: 36px 1fr; gap: 12px;
-      background: var(--card); border: 1px solid var(--line);
-      border-radius: var(--radius); padding: 16px;
-    }
-    .num {
-      width: 36px; height: 36px; border-radius: 10px;
-      display: grid; place-items: center; background: #243049;
-      color: var(--accent); font-weight: 700;
-    }
-    .step h3 { margin: 0 0 4px; font-size: 1rem; }
-    .step p { margin: 0; color: var(--muted); font-size: 0.92rem; }
-    .fail {
-      margin-top: 14px; padding: 14px 16px; border-radius: var(--radius);
-      border: 1px dashed var(--line); color: var(--muted); font-size: 0.88rem;
-    }
-    .fail strong { color: var(--fg); }
-    .fail ul { margin: 8px 0 0; padding-left: 1.1em; }
-    footer {
-      margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--line);
-      color: var(--muted); font-size: 0.9rem;
-      display: flex; flex-wrap: wrap; gap: 12px 20px; justify-content: space-between;
-    }
-    footer .links { display: flex; flex-wrap: wrap; gap: 14px; }
-    #support {
-      margin-top: 36px; padding: 16px; border-radius: var(--radius);
-      border: 1px solid var(--line); background: rgba(255,255,255,0.02);
-    }
-    #support h2 { margin-bottom: 8px; }
-    .tip-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 12px;
-      margin-top: 14px;
-    }
-    .tip-card { text-align: center; }
-    .tip-qr {
-      margin: 10px auto 0;
-      display: block;
-      border-radius: 8px;
-      background: #fff;
-      object-fit: contain;
-    }
-    .tip-qr.missing { display: none; }
-    .tip-placeholder { margin-top: 10px; }
-    #tip-intl-link { display: inline-block; margin-top: 10px; font-weight: 650; }
-    .hidden { display: none !important; }
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <header>
-      <div class="brand">CapsLock Bye</div>
-      <div class="lang" role="group" aria-label="Language">
-        <button type="button" id="btn-zh" aria-pressed="true">中</button>
-        <button type="button" id="btn-en" aria-pressed="false">EN</button>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f8f7f4" />
+    <title>CapsLock Bye · 轻点 Esc，按住 Hyper</title>
+    <meta
+      name="description"
+      content="轻点 Caps Lock 发送 Esc，按住变成 Hyper。免费、开源的原生 macOS 菜单栏工具，按键在本机处理。支持 macOS 14+、Apple Silicon 和 Intel。"
+    />
+    <meta property="og:title" content="CapsLock Bye · 轻点 Esc，按住 Hyper" />
+    <meta
+      property="og:description"
+      content="轻点 Caps Lock 发送 Esc，按住发送 Hyper。免费、开源的 Mac 菜单栏工具。"
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:image"
+      content="https://capslock-bye.keli.tech/assets/app-preview.webp"
+    />
+    <link rel="canonical" href="https://capslock-bye.keli.tech/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./app.js" defer></script>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-WJEFXV72R3"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-WJEFXV72R3");
+    </script>
+  </head>
+  <body>
+    <svg
+      class="icon-definitions"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <symbol id="icon-arrow" viewBox="0 0 24 24">
+        <path d="M5 12h14m-6-6 6 6-6 6" />
+      </symbol>
+      <symbol id="icon-diagonal" viewBox="0 0 24 24">
+        <path d="M6 18 18 6M6 6h12v12" />
+      </symbol>
+      <symbol id="icon-download" viewBox="0 0 24 24">
+        <path d="M12 3v12m-5-5 5 5 5-5M5 16v4h14v-4" />
+      </symbol>
+      <symbol id="icon-caps" viewBox="0 0 24 24">
+        <path d="m12 3 9 8h-5v5H8v-5H3l9-8ZM8 20h8" />
+      </symbol>
+      <symbol id="icon-check" viewBox="0 0 24 24">
+        <path d="m5 12 4 4L19 6" />
+      </symbol>
+      <symbol id="icon-shield" viewBox="0 0 24 24">
+        <path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6l8-3Z" />
+        <path d="m8 12 3 3 5-6" />
+      </symbol>
+      <symbol id="icon-sliders" viewBox="0 0 24 24">
+        <path d="M3 6h6m4 0h8M3 18h10m4 0h4" />
+        <circle cx="11" cy="6" r="2" />
+        <circle cx="15" cy="18" r="2" />
+      </symbol>
+      <symbol id="icon-command" viewBox="0 0 24 24">
+        <path
+          d="M8 8V5a3 3 0 1 0-3 3h14a3 3 0 1 0-3-3v14a3 3 0 1 0 3-3H5a3 3 0 1 0 3 3V8Z"
+        />
+      </symbol>
+      <symbol id="icon-plus" viewBox="0 0 24 24">
+        <path d="M12 5v14M5 12h14" />
+      </symbol>
+      <symbol id="icon-github" viewBox="0 0 24 24">
+        <path
+          d="M9 19c-4 1-4-2-6-2m12 5v-4c0-1-.3-2-1-2 4-.5 7-2 7-6a5 5 0 0 0-1.5-3.5c.4-1 .4-2-.1-3.5 0 0-1.5-.5-4 1a13 13 0 0 0-7 0c-2.5-1.5-4-1-4-1-.5 1.5-.5 2.5-.1 3.5A5 5 0 0 0 3 10c0 4 3 5.5 7 6-.7.5-1 1.5-1 2v4"
+        />
+      </symbol>
+    </svg>
+    <a class="skip-link" href="#main" data-i18n="skip">跳到主要内容</a>
+
+    <header class="site-header container">
+      <a class="brand" href="#" aria-label="CapsLock Bye"
+        ><span class="brand-mark" aria-hidden="true"
+          ><svg class="icon"><use href="#icon-caps" /></svg></span
+        ><span>CapsLock Bye<span class="brand-period">.</span></span></a
+      >
+      <nav class="main-nav" aria-label="主导航" data-i18n-aria="nav_label">
+        <a class="nav-section" href="#how-it-works" data-i18n="nav_how"
+          >如何使用</a
+        >
+        <a class="nav-section" href="#install" data-i18n="nav_install"
+          >安装指南</a
+        >
+        <a class="github-link" href="https://github.com/nixihz/capslock-bye"
+          >GitHub<svg class="icon"><use href="#icon-diagonal" /></svg
+        ></a>
+      </nav>
+      <div
+        class="language-switch"
+        role="group"
+        aria-label="语言"
+        data-i18n-aria="language_label"
+      >
+        <button
+          type="button"
+          id="btn-zh"
+          lang="zh-CN"
+          aria-pressed="true"
+          aria-label="简体中文"
+        >
+          中</button
+        ><button
+          type="button"
+          id="btn-en"
+          lang="en"
+          aria-pressed="false"
+          aria-label="EN / English"
+        >
+          EN
+        </button>
       </div>
     </header>
 
-    <main>
-      <h1 data-i18n="hero_title">Caps Lock 终于有用了——轻点 Esc，按住变 Hyper</h1>
-      <p class="sub" data-i18n="hero_sub">给 Mac 上写代码、用 Vim / Alfred / 自定义热键的人。本地运行，无账号，菜单栏即装即用。</p>
-      <ul class="pills">
-        <li data-i18n="pill_local">本地 · 无账号</li>
-        <li data-i18n="pill_free">Apple 公证 · 免费安装</li>
-        <li data-i18n="pill_oss">开源</li>
-        <li data-i18n="pill_os">macOS 14+</li>
-      </ul>
-
-      <div class="demo" aria-label="Demo">
-        <div class="card">
-          <div class="kicker" data-i18n="demo_tap_k">Tap</div>
-          <div class="action" data-i18n="demo_tap_a">轻点 → Esc</div>
-          <div class="detail" data-i18n="demo_tap_d">适合 Vim、快速退出输入。</div>
+    <main id="main">
+      <section class="hero container" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">
+            <span class="status-dot" aria-hidden="true"></span
+            ><span data-i18n="hero_eyebrow">一个小巧的 Mac 键盘工具</span>
+          </p>
+          <h1 id="hero-title">
+            <span data-i18n="hero_line1">轻点 Esc，</span><br /><span
+              class="accent-text"
+              data-i18n="hero_line2"
+              >按住 Hyper。</span
+            >
+          </h1>
+          <p class="hero-description" data-i18n="hero_description">
+            把 Caps Lock
+            改成用得上的键。轻点退出，按住再接一颗键，就能触发设好的快捷操作。
+          </p>
+          <div class="hero-actions">
+            <a
+              class="button button-primary"
+              id="download-btn"
+              href="https://github.com/nixihz/capslock-bye/releases/latest"
+              ><svg class="icon"><use href="#icon-download" /></svg
+              ><span data-i18n="download">免费下载 Mac 版</span></a
+            ><a class="text-link" href="#how-it-works"
+              ><span data-i18n="hero_explore">看看它怎么工作</span
+              ><svg class="icon"><use href="#icon-arrow" /></svg
+            ></a>
+          </div>
+          <p class="download-note" data-i18n="download_note">
+            macOS 14+ · Apple Silicon 与 Intel
+          </p>
+          <div class="hero-proof">
+            <span
+              ><svg class="icon"><use href="#icon-check" /></svg
+              ><span data-i18n="proof_free">免费开源</span></span
+            ><span
+              ><svg class="icon"><use href="#icon-shield" /></svg
+              ><span data-i18n="proof_notarized">Apple 公证</span></span
+            ><span
+              ><svg class="icon"><use href="#icon-check" /></svg
+              ><span data-i18n="proof_local">按键本地处理</span></span
+            >
+          </div>
         </div>
-        <div class="card">
-          <div class="kicker" data-i18n="demo_hold_k">Hold</div>
-          <div class="action" data-i18n="demo_hold_a">按住 → Hyper</div>
-          <div class="detail" data-i18n="demo_hold_d">Hyper = ⌘⌃⌥⇧，留给你的全局热键层。</div>
+        <div class="interactive-demo" data-mode="tap">
+          <div class="demo-heading">
+            <span class="mono">CAPS LOCK, REIMAGINED</span
+            ><span class="demo-live"
+              ><span class="status-dot" aria-hidden="true"></span
+              ><span data-i18n="demo_live">可交互演示</span></span
+            >
+          </div>
+          <div class="key-stage">
+            <span class="stage-caption" data-i18n="stage_caption"
+              >还是这颗键，换个用法。</span
+            >
+            <div class="ghost-key ghost-key-one" aria-hidden="true">
+              tab <span>⇥</span>
+            </div>
+            <div class="ghost-key ghost-key-two" aria-hidden="true">
+              shift <span>⇧</span>
+            </div>
+            <div class="key-perspective">
+              <button
+                class="caps-key"
+                id="caps-key"
+                type="button"
+                aria-label="演示 Caps Lock：轻点发送 Esc，按住 180 毫秒显示 Hyper"
+                data-i18n-aria="key_label"
+                aria-describedby="demo-instruction"
+              >
+                <span class="key-face"
+                  ><svg class="caps-symbol" aria-hidden="true">
+                    <use href="#icon-caps" /></svg
+                  ><span class="key-led" aria-hidden="true"></span
+                  ><span class="key-name">caps lock</span
+                  ><span class="key-corner" aria-hidden="true">↗</span></span
+                >
+              </button>
+            </div>
+            <div class="stage-output" aria-hidden="true">
+              <span class="output-name">ESCAPE</span
+              ><span class="output-symbol">esc</span>
+            </div>
+            <span class="stage-coordinate mono" aria-hidden="true"
+              >01 / 02</span
+            >
+          </div>
+          <div
+            class="demo-controls"
+            role="group"
+            aria-label="选择演示"
+            data-i18n-aria="demo_controls_label"
+          >
+            <button
+              class="demo-mode"
+              id="demo-tap"
+              type="button"
+              aria-pressed="true"
+            >
+              <span data-i18n="tap">轻点</span
+              ><span class="mode-result"
+                >Esc <span aria-hidden="true">↗</span></span
+              ></button
+            ><button
+              class="demo-mode"
+              id="demo-hold"
+              type="button"
+              aria-pressed="false"
+            >
+              <span data-i18n="hold">按住</span
+              ><span class="mode-result"
+                >Hyper <span aria-hidden="true">↗</span></span
+              >
+            </button>
+          </div>
+          <p
+            class="demo-instruction"
+            id="demo-instruction"
+            data-i18n="demo_instruction"
+          >
+            试着轻点或按住上面的键帽，也可选择「轻点 / 按住」。
+          </p>
+          <p
+            class="sr-only"
+            id="demo-announcement"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+          ></p>
+          <noscript
+            ><p class="demo-instruction">
+              开启 JavaScript 即可试用交互演示。轻点发送 Esc，长按发送 ⌘ ⌃ ⌥ ⇧。
+            </p></noscript
+          >
+        </div>
+      </section>
+      <div class="principles-strip container">
+        <p data-i18n="strip_intro">装好后，留在菜单栏就行。</p>
+        <div>
+          <span data-i18n="strip_native">原生 macOS</span
+          ><span class="strip-divider" aria-hidden="true">/</span
+          ><span data-i18n="strip_account">无需账号</span
+          ><span class="strip-divider" aria-hidden="true">/</span
+          ><span data-i18n="strip_driver">无需驱动</span
+          ><span class="strip-divider" aria-hidden="true">/</span
+          ><span data-i18n="strip_menubar">安静待在菜单栏</span>
         </div>
       </div>
 
-      <div class="cta-row">
-        <a class="btn" id="download-btn" href="./downloads/CapsLock-Bye-1.0.0-universal-notarized.dmg" data-i18n="cta">免费下载</a>
-        <span class="meta" data-i18n="cta_note">Universal DMG · Developer ID 已公证</span>
-      </div>
-      <p class="meta">SHA256 <code id="sha">6e30715d1582025c5e11c521c0ab14f7a76a17b8bb71191c9e3f738363a2245e</code></p>
-      <p class="meta">
-        <a href="https://github.com/nixihz/capslock-bye" data-i18n="release_notes">开源仓库</a>
-      </p>
-
-      <section id="permissions">
-        <h2 data-i18n="perm_title">权限两步</h2>
-        <div class="steps">
-          <div class="step">
-            <div class="num">1</div>
-            <div>
-              <h3 data-i18n="perm1_h">辅助功能</h3>
-              <p data-i18n="perm1_p">打开系统设置 → 隐私与安全性 → 辅助功能，打开 CapsLock Bye。列表没有时：在 Finder 显示应用，再点「+」添加。</p>
-            </div>
+      <section
+        class="how-section container section-space"
+        id="how-it-works"
+        aria-labelledby="how-title"
+      >
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow section-eyebrow">
+              <span class="mono section-number">01</span
+              ><span data-i18n="how_eyebrow">轻点与长按</span>
+            </p>
+            <h2 id="how-title" data-i18n="how_title">Esc 就在小指旁边。</h2>
           </div>
-          <div class="step">
-            <div class="num">2</div>
-            <div>
-              <h3 data-i18n="perm2_h">输入监控</h3>
-              <p data-i18n="perm2_p">同样打开「输入监控」。两项都绿，应用才会进入已开启；前台约每 2 秒自动刷新状态。</p>
-            </div>
-          </div>
+          <p class="section-description" data-i18n="how_description">
+            写代码时轻点退出插入模式，按住再接一颗键，就能触发你设好的快捷键。
+          </p>
         </div>
-        <div class="fail">
-          <strong data-i18n="fail_title">常见失败态</strong>
-          <ul>
-            <li data-i18n="fail1">辅助功能未生效：关掉再开，或重试授权</li>
-            <li data-i18n="fail2">输入监控未生效：完全退出应用后重开</li>
-            <li data-i18n="fail3">键盘服务连不上：重启应用或注销再试</li>
-            <li data-i18n="fail4">被别的改键工具占住：先停 Karabiner 等再开</li>
-          </ul>
+        <div class="mapping-grid">
+          <article class="mapping-card tap-card">
+            <div class="mapping-heading">
+              <span class="mapping-label mono">TAP</span
+              ><span class="mapping-number mono">01</span>
+            </div>
+            <div class="mapping-diagram" aria-hidden="true">
+              <span class="small-key">caps lock</span
+              ><svg class="icon diagram-arrow"><use href="#icon-arrow" /></svg
+              ><span class="small-key result-key">esc</span>
+            </div>
+            <h3 data-i18n="tap_title">轻点，发送 Esc。</h3>
+            <p data-i18n="tap_description">
+              退出 Vim 插入模式，或者关闭弹窗。用 Caps Lock 发送
+              Esc，手不用离开主键区。
+            </p>
+            <span class="mapping-footnote" data-i18n="tap_footnote"
+              >还可以设为其他按键，或录制快捷键。</span
+            >
+          </article>
+          <article class="mapping-card hold-card">
+            <div class="mapping-heading">
+              <span class="mapping-label mono">HOLD</span
+              ><span class="mapping-number mono">02</span>
+            </div>
+            <div class="mapping-diagram hyper-diagram" aria-hidden="true">
+              <span class="small-key">caps lock</span
+              ><svg class="icon diagram-arrow"><use href="#icon-arrow" /></svg>
+              <div class="modifier-keys">
+                <span>⌘</span><span>⌃</span><span>⌥</span><span>⇧</span>
+              </div>
+            </div>
+            <h3 data-i18n="hold_title">按住，发送 Hyper。</h3>
+            <p data-i18n="hold_description">
+              一颗键按下 ⌘ ⌃ ⌥ ⇧。在 Alfred、Raycast 等工具中绑定 Hyper
+              组合键，设置你常用的操作。
+            </p>
+            <span class="mapping-footnote" data-i18n="hold_footnote"
+              >默认 180 ms 判定；接其他按键立即触发组合。</span
+            >
+          </article>
         </div>
       </section>
 
-            <section id="support">
-        <h2 data-i18n="tip_title">支持开发</h2>
-        <p class="meta" data-i18n="tip_body">软件免费，MIT 开源。打赏不绑定下载；GitHub Sponsors 不开。也可以提 Issue / PR，或点一颗 Star。</p>
-        <div class="tip-grid">
-          <div class="card tip-card">
-            <div class="kicker" data-i18n="tip_wechat">微信</div>
-            <img class="tip-qr" src="./assets/wechat-qr.png" width="140" height="140" alt="WeChat tip QR" onerror="this.classList.add('missing'); this.nextElementSibling.hidden=false;">
-            <p class="meta tip-placeholder" hidden data-i18n="tip_qr_pending">二维码待放</p>
+      <section
+        class="product-section container section-space"
+        aria-labelledby="product-title"
+      >
+        <div class="product-image">
+          <img
+            src="./assets/app-preview.webp"
+            width="1482"
+            height="850"
+            alt="CapsLock Bye 原生 macOS 界面，展示轻点 Esc、长按 Hyper 和已启用状态"
+            data-i18n-alt="product_alt"
+            loading="lazy"
+            decoding="async"
+          /><span class="image-caption"
+            ><span class="status-dot" aria-hidden="true"></span
+            ><span data-i18n="product_caption"
+              >实际应用界面 · macOS 26</span
+            ></span
+          >
+        </div>
+        <div class="product-copy">
+          <p class="eyebrow section-eyebrow">
+            <span class="mono section-number">02</span
+            ><span data-i18n="product_eyebrow">原生 Mac 应用</span>
+          </p>
+          <h2 id="product-title">
+            <span data-i18n="product_line1">关掉窗口，</span><br /><span
+              data-i18n="product_line2"
+              >它还在菜单栏。</span
+            >
+          </h2>
+          <p class="product-intro" data-i18n="product_description">
+            开启映射后就能关掉窗口。需要调整设置时，点一下菜单栏图标。
+          </p>
+          <div class="product-feature">
+            <svg class="icon"><use href="#icon-sliders" /></svg>
+            <div>
+              <h3 data-i18n="feature_custom_title">判定时间由你定</h3>
+              <p data-i18n="feature_custom_description">
+                轻点快捷键、长按修饰键、判定时间都可以调整。内置试键区，改完即可试。
+              </p>
+            </div>
+          </div>
+          <div class="product-feature">
+            <svg class="icon"><use href="#icon-shield" /></svg>
+            <div>
+              <h3 data-i18n="feature_local_title">不记录输入内容</h3>
+              <p data-i18n="feature_local_description">
+                在本机处理按键，不记录或上传输入内容。无需账号，也不安装驱动。
+              </p>
+            </div>
+          </div>
+          <div class="product-feature">
+            <svg class="icon"><use href="#icon-command" /></svg>
+            <div>
+              <h3 data-i18n="feature_native_title">用 macOS 的系统材质</h3>
+              <p data-i18n="feature_native_description">
+                支持中文与 English、可选登录启动。macOS 26 使用 Liquid
+                Glass，14–15 使用系统材质。
+              </p>
+            </div>
           </div>
         </div>
+      </section>
+
+      <section
+        class="install-section container section-space"
+        id="install"
+        aria-labelledby="install-title"
+      >
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow section-eyebrow">
+              <span class="mono section-number">03</span
+              ><span data-i18n="install_eyebrow">安装与授权</span>
+            </p>
+            <h2 id="install-title" data-i18n="install_title">
+              几步装好，就能用。
+            </h2>
+          </div>
+          <a
+            class="text-link"
+            href="https://github.com/nixihz/capslock-bye/releases/latest"
+            ><span data-i18n="release_link">最新版本与校验文件</span
+            ><svg class="icon"><use href="#icon-diagonal" /></svg
+          ></a>
+        </div>
+        <ol class="install-steps">
+          <li>
+            <span class="step-number mono">01</span>
+            <h3 data-i18n="install1_title">放入应用程序</h3>
+            <p data-i18n="install1_description">
+              下载最新版本的 DMG，打开后将 CapsLock Bye 拖到
+              Applications，再启动应用。
+            </p>
+            <span class="step-detail" data-i18n="install1_detail"
+              >已签名 · 已通过 Apple 公证</span
+            >
+          </li>
+          <li>
+            <span class="step-number mono">02</span>
+            <h3 data-i18n="install2_title">允许两项权限</h3>
+            <p data-i18n="install2_description">
+              跟随应用引导，在「系统设置 →
+              隐私与安全性」中开启辅助功能和输入监控。按提示重新打开应用。
+            </p>
+            <span class="step-detail" data-i18n="install2_detail"
+              >用于接收按键并发送映射后的操作</span
+            >
+          </li>
+          <li>
+            <span class="step-number mono">03</span>
+            <h3 data-i18n="install3_title">试试你的新按键</h3>
+            <p data-i18n="install3_description">
+              开启映射，在试键区检查轻点与长按。关掉窗口，让它待在菜单栏，继续你的工作。
+            </p>
+            <span class="step-detail" data-i18n="install3_detail"
+              >左击菜单栏图标打开 · 右击暂停或退出</span
+            >
+          </li>
+        </ol>
+      </section>
+
+      <section
+        class="faq-section container section-space"
+        aria-labelledby="faq-title"
+      >
+        <div class="faq-intro">
+          <p class="eyebrow section-eyebrow" data-i18n="faq_eyebrow">
+            常见问题
+          </p>
+          <h2 id="faq-title" data-i18n="faq_title">可能会碰到这些问题。</h2>
+          <a
+            class="text-link"
+            href="https://github.com/nixihz/capslock-bye/issues"
+            ><span data-i18n="faq_help">到 GitHub 提问</span
+            ><svg class="icon"><use href="#icon-diagonal" /></svg
+          ></a>
+        </div>
+        <div class="faq-list">
+          <details>
+            <summary>
+              <span data-i18n="faq1_question"
+                >Hyper 是什么？会自动帮我启动应用吗？</span
+              ><svg class="icon"><use href="#icon-plus" /></svg>
+            </summary>
+            <p data-i18n="faq1_answer">
+              Hyper 是 Command、Control、Option、Shift
+              四个修饰键的组合。CapsLock Bye 负责发送组合键；你可以在
+              Alfred、Raycast 或其他支持自定义快捷键的工具里，为 Hyper
+              加其他按键绑定操作。
+            </p>
+          </details>
+          <details>
+            <summary>
+              <span data-i18n="faq2_question">可以和其他改键工具一起用吗？</span
+              ><svg class="icon"><use href="#icon-plus" /></svg>
+            </summary>
+            <p data-i18n="faq2_answer">
+              请停用其他工具对 Caps Lock 的映射，并在键盘固件和 macOS
+              系统设置中保留 Caps Lock 的默认定义，避免同时改写同一颗键。
+            </p>
+          </details>
+          <details>
+            <summary>
+              <span data-i18n="faq3_question"
+                >为什么在部分密码框里不起作用？</span
+              ><svg class="icon"><use href="#icon-plus" /></svg>
+            </summary>
+            <p data-i18n="faq3_answer">
+              macOS
+              的安全输入启用时，应用会暂停映射，例如某些密码输入框中。退出安全输入后，映射会自动恢复。
+            </p>
+          </details>
+          <details>
+            <summary>
+              <span data-i18n="faq4_question">授权后没有生效，怎么办？</span
+              ><svg class="icon"><use href="#icon-plus" /></svg>
+            </summary>
+            <p data-i18n="faq4_answer">
+              辅助功能未生效时，尝试关闭再开启该权限；输入监控未生效时，完全退出应用后重新打开。列表中找不到应用，可点击「+」手动添加。仍有问题时，请提交
+              Issue 并说明 macOS 版本和键盘型号。
+            </p>
+          </details>
+          <details>
+            <summary>
+              <span data-i18n="faq5_question">免费吗？支持哪些 Mac？</span
+              ><svg class="icon"><use href="#icon-plus" /></svg>
+            </summary>
+            <p data-i18n="faq5_answer">
+              免费，MIT 开源。需要 macOS 14 或更新版本，通用安装包支持 Apple
+              Silicon 与 Intel。最新发布页同时提供 DMG 和对应的 SHA256
+              校验文件。
+            </p>
+          </details>
+        </div>
+      </section>
+      <section
+        class="closing-section container"
+        aria-labelledby="closing-title"
+      >
+        <span class="closing-symbol" aria-hidden="true">↗</span>
+        <div>
+          <p class="eyebrow" data-i18n="closing_eyebrow">CapsLock Bye</p>
+          <h2 id="closing-title" data-i18n="closing_title">
+            Caps Lock，换个用法试试。
+          </h2>
+          <p data-i18n="closing_description">
+            免费、开源，支持 macOS 14 或更新版本。
+          </p>
+        </div>
+        <a
+          class="button button-primary"
+          href="https://github.com/nixihz/capslock-bye/releases/latest"
+          ><svg class="icon"><use href="#icon-download" /></svg
+          ><span data-i18n="download">免费下载 Mac 版</span></a
+        >
       </section>
     </main>
-
-    <footer>
-      <div class="links">
-        <a href="#support" data-i18n="footer_tip">支持开发</a>
-        <a href="https://github.com/nixihz/capslock-bye" data-i18n="footer_source">源码 / GitHub</a>
-        <a href="https://github.com/nixihz/capslock-bye/issues" id="issues-link" data-i18n="footer_feedback">反馈 / Issues</a>
+    <footer class="site-footer container">
+      <div>
+        <a class="brand footer-brand" href="#"
+          ><span class="brand-mark" aria-hidden="true"
+            ><svg class="icon"><use href="#icon-caps" /></svg></span
+          ><span>CapsLock Bye<span class="brand-period">.</span></span></a
+        >
+        <p data-i18n="footer_description">轻点 Esc，按住 Hyper。</p>
       </div>
-      <div data-i18n="footer_copy">© CapsLock Bye · tech.keli.capslock-bye</div>
+      <div class="footer-links">
+        <a href="https://github.com/nixihz/capslock-bye"
+          ><svg class="icon"><use href="#icon-github" /></svg
+          ><span data-i18n="footer_source">源码</span></a
+        ><a
+          href="https://github.com/nixihz/capslock-bye/issues"
+          data-i18n="footer_feedback"
+          >问题反馈</a
+        ><a href="https://github.com/nixihz/capslock-bye/blob/main/LICENSE"
+          >MIT License</a
+        >
+      </div>
+      <p class="footer-credit">© 2026 nixihz</p>
     </footer>
-  </div>
-
-  <script>
-    const dict = {
-      zh: {
-        hero_title: "Caps Lock 终于有用了——轻点 Esc，按住变 Hyper",
-        hero_sub: "给 Mac 上写代码、用 Vim / Alfred / 自定义热键的人。本地运行，无账号，菜单栏即装即用。",
-        pill_local: "本地 · 无账号",
-        pill_free: "Apple 公证 · 免费安装",
-        pill_oss: "开源",
-        pill_os: "macOS 14+",
-        demo_tap_k: "Tap",
-        demo_tap_a: "轻点 → Esc",
-        demo_tap_d: "适合 Vim、快速退出输入。",
-        demo_hold_k: "Hold",
-        demo_hold_a: "按住 → Hyper",
-        demo_hold_d: "Hyper = ⌘⌃⌥⇧，留给你的全局热键层。",
-        cta: "免费下载",
-        cta_note: "Universal DMG · Developer ID 已公证",
-        release_notes: "开源仓库",
-        perm_title: "权限两步",
-        perm1_h: "辅助功能",
-        perm1_p: "打开系统设置 → 隐私与安全性 → 辅助功能，打开 CapsLock Bye。列表没有时：在 Finder 显示应用，再点「+」添加。",
-        perm2_h: "输入监控",
-        perm2_p: "同样打开「输入监控」。两项都绿，应用才会进入已开启；前台约每 2 秒自动刷新状态。",
-        fail_title: "常见失败态",
-        fail1: "辅助功能未生效：关掉再开，或重试授权",
-        fail2: "输入监控未生效：完全退出应用后重开",
-        fail3: "键盘服务连不上：重启应用或注销再试",
-        fail4: "被别的改键工具占住：先停 Karabiner 等再开",
-        tip_title: "支持开发",
-        tip_body: "软件免费，MIT 开源。打赏不绑定下载；GitHub Sponsors 不开。也可以提 Issue / PR，或点一颗 Star。",
-        tip_wechat: "微信",
-        tip_qr_pending: "二维码待放",
-        footer_tip: "支持开发",
-        footer_source: "源码 / GitHub",
-        footer_feedback: "反馈 / Issues",
-        footer_copy: "© CapsLock Bye · tech.keli.capslock-bye"
-      },
-      en: {
-        hero_title: "Caps Lock, finally useful — tap Esc, hold Hyper",
-        hero_sub: "For Mac power users on Vim, Alfred, and custom hotkeys. Local, no account, menu-bar install.",
-        pill_local: "Local · no account",
-        pill_free: "Notarized · free download",
-        pill_oss: "Open source",
-        pill_os: "macOS 14+",
-        demo_tap_k: "Tap",
-        demo_tap_a: "Tap → Esc",
-        demo_tap_d: "Great for Vim and quick escapes.",
-        demo_hold_k: "Hold",
-        demo_hold_a: "Hold → Hyper",
-        demo_hold_d: "Hyper = ⌘⌃⌥⇧ for your global hotkey layer.",
-        cta: "Download free",
-        cta_note: "Universal DMG · Developer ID notarized",
-        release_notes: "Open-source repo",
-        perm_title: "Two permissions",
-        perm1_h: "Accessibility",
-        perm1_p: "System Settings → Privacy & Security → Accessibility, enable CapsLock Bye. Missing from the list? Reveal the app in Finder, then add it with +.",
-        perm2_h: "Input Monitoring",
-        perm2_p: "Enable Input Monitoring the same way. Both must be green before the app turns on; status refreshes about every 2s in the foreground.",
-        fail_title: "If something fails",
-        fail1: "Accessibility not taking effect: toggle off/on, then retry",
-        fail2: "Input Monitoring not taking effect: quit the app fully and reopen",
-        fail3: "Keyboard service unreachable: relaunch or log out/in",
-        fail4: "Another remapper holds the tap: pause Karabiner etc. first",
-        tip_title: "Support development",
-        tip_body: "Free under MIT. Tip below never gates the download; GitHub Sponsors stays off. Issues, PRs, and stars welcome.",
-        tip_wechat: "WeChat",
-        tip_qr_pending: "QR coming soon",
-        footer_tip: "Support",
-        footer_source: "Source / GitHub",
-        footer_feedback: "Feedback / Issues",
-        footer_copy: "© CapsLock Bye · tech.keli.capslock-bye"
-      }
-    };
-
-    function setLang(lang) {
-      const pack = dict[lang] || dict.zh;
-      document.documentElement.lang = lang === "en" ? "en" : "zh-CN";
-      document.querySelectorAll("[data-i18n]").forEach((el) => {
-        const key = el.getAttribute("data-i18n");
-        if (pack[key]) el.textContent = pack[key];
-      });
-      document.getElementById("btn-zh").setAttribute("aria-pressed", lang === "zh" ? "true" : "false");
-      document.getElementById("btn-en").setAttribute("aria-pressed", lang === "en" ? "true" : "false");
-      try { localStorage.setItem("capslock-bye-lang", lang); } catch (_) {}
-    }
-
-    document.getElementById("btn-zh").addEventListener("click", () => setLang("zh"));
-    document.getElementById("btn-en").addEventListener("click", () => setLang("en"));
-    let initial = "zh";
-    try {
-      const saved = localStorage.getItem("capslock-bye-lang");
-      if (saved === "en" || saved === "zh") initial = saved;
-      else if (navigator.language && navigator.language.toLowerCase().startsWith("en")) initial = "en";
-    } catch (_) {}
-    setLang(initial);
-  </script>
-</body>
+  </body>
 </html>
