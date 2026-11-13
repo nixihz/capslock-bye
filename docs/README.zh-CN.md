@@ -2,7 +2,7 @@
 
 **轻点 Caps Lock 发送 Esc，按住变成 Hyper（⌘ ⌃ ⌥ ⇧）。**
 
-[English](../README.md) · [官网](https://capslock-bye.keli.tech/) · [下载](https://github.com/nixihz/capslock-bye/releases/latest) · [问题反馈](https://github.com/nixihz/capslock-bye/issues)
+[English](../README.md) · [官网](https://capslock-bye.u1.fan/) · [下载](https://github.com/nixihz/capslock-bye/releases/latest) · [问题反馈](https://github.com/nixihz/capslock-bye/issues)
 
 [![CI](https://github.com/nixihz/capslock-bye/actions/workflows/ci.yml/badge.svg)](https://github.com/nixihz/capslock-bye/actions/workflows/ci.yml)
 
